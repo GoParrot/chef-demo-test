@@ -1,0 +1,51 @@
+worker_processes 1;
+
+events { worker_connections 1024; }
+
+http {
+
+    sendfile on;
+
+    upstream docker-nginx {
+        <% @nodes.each do |n| -%>
+         <%= "server #{n['fqdn']};" %>
+        <% end -%>
+    }
+    
+    <%# upstream docker-apache {
+        least_conn;
+        server apache:80;
+        server apache:81;
+        server apache:82;
+    } %>
+    upstream jenkins-nginx {
+        <%=  "server #{@jenkins['fqdn']};" %>
+    }
+    
+    server {
+        listen 80;
+       
+        location / {
+            proxy_pass         http://docker-nginx;
+            proxy_redirect     off;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+            proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Host $server_name;
+        }
+    }
+
+    server {
+        listen 8081;
+        
+        location / {
+            proxy_pass         http://jenkins-nginx;
+            proxy_redirect     off;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+            proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Host $server_name;
+        }
+    }
+
+}

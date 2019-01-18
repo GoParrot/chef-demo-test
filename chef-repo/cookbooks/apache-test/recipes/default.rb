@@ -1,0 +1,1 @@
+include_recipe 'apache-test::init_setup'

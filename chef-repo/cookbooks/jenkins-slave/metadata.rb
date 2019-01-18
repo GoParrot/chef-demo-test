@@ -1,0 +1,11 @@
+name 'jenkins-slave'
+maintainer 'Marko Petrovic'
+maintainer_email 'mrpetrovic@outlook.com'
+license 'All Rights Reserved'
+description 'Installs/Configures jenkins-slave'
+long_description 'Installs/Configures jenkins-slave'
+version '0.1.0'
+chef_version '>= 13.0'
+
+depends 'apt',  '~> 7.1.1' 
+depends 'java',  '~> 3.1.1'

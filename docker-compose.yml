@@ -1,0 +1,38 @@
+version: '3'
+
+services: 
+    chef-server:
+        image: cbuisson/chef-server
+        container_name: chef-server
+        hostname: chef-server
+        ports:
+            - "8600:443"
+
+    chef_dk: 
+        depends_on: 
+         - chef-server
+        build: ./chef-dk/
+        image: chef_dk:0.1
+        container_name: chefdk
+        hostname: chefdk
+        command: tail -F /dev/null & wait
+        ports: 
+            - "8700:80"
+        volumes: 
+            - ./chef-repo:/root/chef-repo/
+        
+    test_node:
+        build: ./test-node
+        image: test_node
+        # container_name: test-node
+        # hostname: test-node
+        ports:
+            - "8900-8999:443"
+            - "8900-8999:80"
+            - "8900-8999:22"
+            - "8900-8999:8080"
+            
+        depends_on: 
+            - chef_dk
+            - chef-server
+    
